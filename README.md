@@ -1,6 +1,6 @@
 # Overview
 * there have been some problems at the very beginning: the API Endpoint for getting exchange rates `https://api.exchangeratesapi.io/latest` requires an API key and the free one which could be obtained is using endpoint `https://api.apilayer.com/exchangerates_data/latest`. Not sure if it was a part of a task, most likely yes;)
-* in addition to above in [Settings.php](https://link-url-here.org) I've included my free API key
+* in addition to above in [Settings.php](https://github.com/artemk0/artem-kostiuk-test-task/blob/master/src/Settings.php) I've included my free API key
 * generally I've tried to keep the code free from all the dependencies: used `file_get_contents()` approach instead of cUrl, minimum PHP version should be 7.4 (haven't tested it though: developed with php8.1), the only composer dependency is `ext-json` and `phpunit` in `require-dev`
 * tried to follow the [Paysera PHP style guide](https://github.com/paysera/php-style-guide) however there might be some exceptions only because the document is so big;)
 * checkout running it with `input2.txt`: maybe some improvements for displaying error cases
