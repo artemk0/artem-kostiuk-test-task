@@ -1,47 +1,27 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Service;
 
 use App\Client\BinClient;
+use App\Client\BinClientInterface;
 use App\Entity\Transaction;
 use App\Exceptions\FailedToLoadSingleTransaction;
 use App\Exceptions\FailedToLoadTransactions;
 
 class TransactionLoader
 {
-    /**
-     * @var BinClient
-     */
-    private BinClient $binClient;
-
-    /**
-     * @var FileReader
-     */
-    private FileReader $fileReader;
-
-    /**
-     * @var array
-     */
-    private array $transactions;
-
-    /**
-     * @var array
-     */
-    private array $failedTransactions;
-
-    public function __construct(BinClient $binClient, FileReader $fileReader)
-    {
-        $this->binClient = $binClient;
-        $this->fileReader = $fileReader;
-    }
+    public function __construct(
+        private BinClientInterface $binClient,
+        private FileReader $fileReader,
+        private array $transactions = [],
+        private array $failedTransactions = []
+    ) {}
 
     public function loadFromFile(): self
     {
         $lines = $this->fileReader->readFile();
 
-        if (empty($lines)) {
+        if (count($lines) === 0 || $lines === false) {
             throw new FailedToLoadTransactions('Can not read file "' . $this->fileReader->getFilename() . '".');
         }
 
@@ -69,7 +49,7 @@ class TransactionLoader
         }
 
         foreach (['bin', 'amount', 'currency'] as $key) {
-            if (empty($result[$key])) {
+            if (!isset($result[$key])) {
                 throw new FailedToLoadSingleTransaction('Not found required key: ' . $key);
             }
         }
@@ -83,25 +63,16 @@ class TransactionLoader
         return new Transaction($bin, $amount, $currency, $eUIssued);
     }
 
-    /**
-     * @return array
-     */
     public function getTransactions(): array
     {
         return $this->transactions;
     }
 
-    /**
-     * @return bool
-     */
     public function hasFailedTransactions(): bool
     {
         return !empty($this->failedTransactions);
     }
 
-    /**
-     * @return array
-     */
     public function getFailedTransactions(): array
     {
         return $this->failedTransactions;

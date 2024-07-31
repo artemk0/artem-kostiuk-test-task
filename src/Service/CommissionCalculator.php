@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Service;
 
 use App\Client\ExchangeRatesClient;
@@ -9,26 +7,11 @@ use App\Settings;
 
 class CommissionCalculator
 {
-    /**
-     * @var array
-     */
-    private array $transactions;
-
-    /**
-     * @var ExchangeRatesClient
-     */
-    private ExchangeRatesClient $exchangeRatesClient;
-
-    /**
-     * @var array
-     */
-    private array $commissions;
-
-    public function __construct(array $transactions, ExchangeRatesClient $exchangeRatesClient)
-    {
-        $this->transactions = $transactions;
-        $this->exchangeRatesClient = $exchangeRatesClient;
-    }
+    public function __construct(
+        private array $transactions,
+        private ExchangeRatesClient $exchangeRatesClient,
+        private array $commissions = []
+    ) {}
 
     public function calcCommissions(): self
     {
@@ -56,9 +39,6 @@ class CommissionCalculator
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getCommissions(): array
     {
         return $this->commissions;

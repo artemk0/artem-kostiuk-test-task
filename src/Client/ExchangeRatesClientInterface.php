@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Client;
 
 interface ExchangeRatesClientInterface
 {
-    public function __construct(SimpleJsonHttpClient $httpClient);
+    public function __construct(SimpleJsonHttpClient $httpClient, ?array $rates);
 
     public function getRates(): array;
 

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Client;
 
 use App\Exceptions\CanNotGetResponseFrom3rdParty;
@@ -34,7 +32,7 @@ class SimpleJsonHttpClient
         $context = null,
         int $offset = 0,
         ?int $length = null
-    ) {
+    ): bool|string {
         return file_get_contents($filename, $use_include_path, $context, $offset, $length);
     }
 }

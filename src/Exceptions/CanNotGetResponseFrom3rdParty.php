@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
-class CanNotGetResponseFrom3rdParty extends \Exception
+use Exception;
+
+class CanNotGetResponseFrom3rdParty extends Exception
 {
 }

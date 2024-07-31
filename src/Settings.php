@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App;
+
+use Exception;
 
 class Settings
 {
@@ -44,8 +44,8 @@ class Settings
 
     public static function get(string $key): mixed
     {
-        if (empty(self::$values[$key])) {
-            throw new \Exception('Settings key "' . $key . '" does not exists.');
+        if (!isset(self::$values[$key])) {
+            throw new Exception('Settings key "' . $key . '" does not exists.');
         }
 
         return self::$values[$key];

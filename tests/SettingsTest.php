@@ -1,15 +1,16 @@
 <?php
 
-declare(strict_types=1);
+namespace tests;
 
 use App\Settings;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
-class SettingsTest extends TestCase
+final class SettingsTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('Settings key "42" does not exists.');
 
         Settings::get('42');

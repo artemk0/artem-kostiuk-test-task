@@ -1,19 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Client;
 
 use App\Settings;
 
 class BinClient implements BinClientInterface
 {
-    private SimpleJsonHttpClient $httpClient;
-
-    public function __construct(SimpleJsonHttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
+    public function __construct(private SimpleJsonHttpClient $httpClient) {}
 
     public function getAlpha2CountryCode(int $binNumber): string
     {

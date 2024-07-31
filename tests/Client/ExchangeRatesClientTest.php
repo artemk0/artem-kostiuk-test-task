@@ -1,18 +1,17 @@
 <?php
 
-declare(strict_types=1);
+namespace tests\Client;
 
 use App\Client\ExchangeRatesClient;
 use App\Client\SimpleJsonHttpClient;
 use App\Exceptions\CanNotGetResponseFrom3rdParty;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class ExchangeRatesClientTest extends TestCase
+final class ExchangeRatesClientTest extends TestCase
 {
-    /**
-     * @dataProvider getRatesProvider
-     */
-    public function testGetRates(int $binNumber, string $response, $expected, $optional = '')
+    #[DataProvider('getRatesProvider')]
+    public function testGetRates(int $binNumber, string $response, int|string $expected, string $optional = ''): void
     {
         $simpleJsonHttpClientMock = $this->getMockBuilder(SimpleJsonHttpClient::class)
             ->onlyMethods(['getResponse'])
@@ -37,10 +36,8 @@ class ExchangeRatesClientTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getRateProvider
-     */
-    public function testGetRate(int $binNumber, string $response, $expected, $optional = '')
+    #[DataProvider('getRateProvider')]
+    public function testGetRate(int $binNumber, string $response, float|string $expected, string $optional = ''): void
     {
         $simpleJsonHttpClientMock = $this->getMockBuilder(SimpleJsonHttpClient::class)
             ->onlyMethods(['getResponse'])
@@ -63,20 +60,16 @@ class ExchangeRatesClientTest extends TestCase
         $this->assertEquals($expected, $exchangeRatesClient->getRate('EUR'));
     }
 
-    public function getRatesProvider(): array
+    public static function getRatesProvider(): iterable
     {
-        return [
-            'Exception empty response' => [42, '', CanNotGetResponseFrom3rdParty::class, 'Empty response'],
-            'Exception failed to decode response' => [4242, '{42', CanNotGetResponseFrom3rdParty::class, 'Can not parse JSON. Error: Syntax error'],
-            'Success response' => [424242, '{"base": "USD","date": "2021-03-17","rates": {"EUR": 0.813399,"GBP": 0.72007,"JPY": 107.346001},"success": true,"timestamp": 1519296206}', 3],
-        ];
+        yield 'Exception empty response' => [42, '', CanNotGetResponseFrom3rdParty::class, 'Empty response'];
+        yield 'Exception failed to decode response' => [4242, '{42', CanNotGetResponseFrom3rdParty::class, 'Can not parse JSON. Error: Syntax error'];
+        yield 'Success response' => [424242, '{"base": "USD","date": "2021-03-17","rates": {"EUR": 0.813399,"GBP": 0.72007,"JPY": 107.346001},"success": true,"timestamp": 1519296206}', 3];
     }
 
-    public function getRateProvider(): array
+    public static function getRateProvider(): iterable
     {
-        return [
-            'Exception unknown currency' => [42, '{"base": "USD","date": "2021-03-17","rates": {"EUR": 0.813399,"GBP": 0.72007,"JPY": 107.346001},"success": true,"timestamp": 1519296206}', CanNotGetResponseFrom3rdParty::class, 'Currency "UNKNOWN_CURRENCY" does not have a rate.'],
-            'Success response' => [4242, '{"base": "USD","date": "2021-03-17","rates": {"EUR": 0.813399,"GBP": 0.72007,"JPY": 107.346001},"success": true,"timestamp": 1519296206}', 0.813399],
-        ];
+        yield 'Exception unknown currency' => [42, '{"base": "USD","date": "2021-03-17","rates": {"EUR": 0.813399,"GBP": 0.72007,"JPY": 107.346001},"success": true,"timestamp": 1519296206}', CanNotGetResponseFrom3rdParty::class, 'Currency "UNKNOWN_CURRENCY" does not have a rate.'];
+        yield 'Success response' => [4242, '{"base": "USD","date": "2021-03-17","rates": {"EUR": 0.813399,"GBP": 0.72007,"JPY": 107.346001},"success": true,"timestamp": 1519296206}', 0.813399];
     }
 }

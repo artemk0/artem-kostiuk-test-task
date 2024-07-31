@@ -1,18 +1,17 @@
 <?php
 
-declare(strict_types=1);
+namespace tests\Service;
 
 use App\Client\ExchangeRatesClient;
 use App\Entity\Transaction;
 use App\Service\CommissionCalculator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class CommissionCalculatorTest extends TestCase
+final class CommissionCalculatorTest extends TestCase
 {
-    /**
-     * @dataProvider calcCommissionsProvider
-     */
-    public function testCalcCommissions(int $binNumber, array $transactions, string $currency, array $rates, float $expected)
+    #[DataProvider('calcCommissionsProvider')]
+    public function testCalcCommissions(int $binNumber, array $transactions, string $currency, array $rates, float $expected): void
     {
         $exchangeRatesClientMock = $this->getMockBuilder(ExchangeRatesClient::class)
             ->disableOriginalConstructor()
@@ -39,7 +38,7 @@ class CommissionCalculatorTest extends TestCase
         }
     }
 
-    public function calcCommissionsProvider(): array
+    public static function calcCommissionsProvider(): iterable
     {
         $transactions = [
             new Transaction(45717360,100.00,'EUR', true),
@@ -56,12 +55,10 @@ class CommissionCalculatorTest extends TestCase
             'GBP' => 0.861339,
         ];
 
-        return [
-            [45717360, $transactions, 'EUR', $rates, 1.0],
-            [45417360, $transactions, 'JPY', $rates, 1.38],
-            [4745030, $transactions, 'GBP', $rates, 46.44],
-            [516793, $transactions, 'USD', $rates, 0.48],
-            [41417360, $transactions, 'USD', $rates, 2.5],
-        ];
+        yield [45717360, $transactions, 'EUR', $rates, 1.0];
+        yield [45417360, $transactions, 'JPY', $rates, 1.38];
+        yield [4745030, $transactions, 'GBP', $rates, 46.44];
+        yield [516793, $transactions, 'USD', $rates, 0.48];
+        yield [41417360, $transactions, 'USD', $rates, 2.5];
     }
 }

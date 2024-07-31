@@ -1,18 +1,17 @@
 <?php
 
-declare(strict_types=1);
+namespace tests\Client;
 
 use App\Client\BinClient;
 use App\Client\SimpleJsonHttpClient;
 use App\Exceptions\CanNotGetResponseFrom3rdParty;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class BinClientTest extends TestCase
+final class BinClientTest extends TestCase
 {
-    /**
-     * @dataProvider getAlpha2CountryCodeResponseProvider
-     */
-    public function testGetAlpha2CountryCode(int $binNumber, string $response, $expected, $optional = '')
+    #[DataProvider('getAlpha2CountryCodeResponseProvider')]
+    public function testGetAlpha2CountryCode(int $binNumber, string $response, string $expected, $optional = ''): void
     {
         $simpleJsonHttpClientMock = $this->getMockBuilder(SimpleJsonHttpClient::class)
             ->onlyMethods(['getResponse'])
@@ -33,10 +32,8 @@ class BinClientTest extends TestCase
         $this->assertEquals($expected, $binClient->getAlpha2CountryCode($binNumber));
     }
 
-    /**
-     * @dataProvider isEUIssuedProvider
-     */
-    public function testIsEUIssued(int $binNumber, string $response, $expected)
+    #[DataProvider('isEUIssuedProvider')]
+    public function testIsEUIssued(int $binNumber, string $response, bool $expected): void
     {
         $simpleJsonHttpClientMock = $this->getMockBuilder(SimpleJsonHttpClient::class)
             ->onlyMethods(['getResponse'])
@@ -53,20 +50,16 @@ class BinClientTest extends TestCase
         $this->assertEquals($expected, $binClient->isEUIssued($binNumber));
     }
 
-    public function getAlpha2CountryCodeResponseProvider(): array
+    public static function getAlpha2CountryCodeResponseProvider(): iterable
     {
-        return [
-            'Exception empty response' => [42, '', CanNotGetResponseFrom3rdParty::class, 'Empty response'],
-            'Exception failed to decode response' => [4242, '{42', CanNotGetResponseFrom3rdParty::class, 'Can not parse JSON. Error: Syntax error'],
-            'Success response' => [424242, '{"country":{"alpha2":"UA"}}', 'UA'],
-        ];
+        yield 'Exception empty response' => [42, '', CanNotGetResponseFrom3rdParty::class, 'Empty response'];
+        yield 'Exception failed to decode response' => [4242, '{42', CanNotGetResponseFrom3rdParty::class, 'Can not parse JSON. Error: Syntax error'];
+        yield 'Success response' => [424242, '{"country":{"alpha2":"UA"}}', 'UA'];
     }
 
-    public function isEUIssuedProvider(): array
+    public static function isEUIssuedProvider(): iterable
     {
-        return [
-            'Issued in EU' => [42, '{"country":{"alpha2":"SE"}}', true],
-            'Not issued in EU' => [4242, '{"country":{"alpha2":"UA"}}', false],
-        ];
+        yield 'Issued in EU' => [42, '{"country":{"alpha2":"SE"}}', true];
+        yield 'Not issued in EU' => [4242, '{"country":{"alpha2":"UA"}}', false];
     }
 }

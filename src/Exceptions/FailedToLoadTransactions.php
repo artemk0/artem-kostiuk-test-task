@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
-class FailedToLoadTransactions extends \Exception
+use Exception;
+
+class FailedToLoadTransactions extends Exception
 {
 }

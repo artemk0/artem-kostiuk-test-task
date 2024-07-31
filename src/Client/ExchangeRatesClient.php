@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Client;
 
 use App\Exceptions\CanNotGetResponseFrom3rdParty;
@@ -9,19 +7,13 @@ use App\Settings;
 
 class ExchangeRatesClient implements ExchangeRatesClientInterface
 {
-    private SimpleJsonHttpClient $httpClient;
-
-    private ?array $rates;
-
-    public function __construct(SimpleJsonHttpClient $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
+    public function __construct(
+        private SimpleJsonHttpClient $httpClient,
+        private ?array $rates = null
+    ) {}
 
     public function getRates(): array
     {
-        $this->rates = null;
-
         $streamContextOptions = [
             'http' => [
                 'header' => 'apikey: ' . Settings::get('exchangeRatesApiKey')
@@ -29,7 +21,7 @@ class ExchangeRatesClient implements ExchangeRatesClientInterface
             'ssl' => [
                 'verify_peer' => false,
                 'verify_peer_name' => false,
-            ]
+            ],
         ];
 
         $response = $this->httpClient->sendRequest('https://api.apilayer.com/exchangerates_data/latest', $streamContextOptions);
@@ -39,11 +31,11 @@ class ExchangeRatesClient implements ExchangeRatesClientInterface
 
     public function getRate(string $currency): float
     {
-        if (empty($this->rates)) {
+        if (!isset($this->rates)) {
             $this->rates = $this->getRates();
         }
 
-        if (empty($this->rates[$currency])) {
+        if (!isset($this->rates[$currency])) {
             throw new CanNotGetResponseFrom3rdParty('Currency "' . $currency . '" does not have a rate.');
         }
 

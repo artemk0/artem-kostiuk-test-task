@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use App\Client;
 use App\Exceptions\CanNotGetResponseFrom3rdParty;
 use App\Exceptions\FailedToLoadTransactions;
@@ -12,7 +10,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $httpClient = new Client\SimpleJsonHttpClient();
 
 $exchangeRatesClient = new Client\ExchangeRatesClient($httpClient);
-$binClient = new Client\BinClient($httpClient);
+
+$client = $argv[2] ?? 'online';
+if ($client === 'online') {
+    $binClient = new Client\BinClient($httpClient);
+} else {
+    $binClient = new Client\BinLocalClient();
+}
 $fileReader = new Service\FileReader($argv[1]);
 
 try {
@@ -35,7 +39,7 @@ try {
     die('Failed to get response from 3rd party API. Message: ' . $e->getMessage());
 } catch (FailedToLoadTransactions $e) {
     die('Failed to load transactions. Message: ' . $e->getMessage());
-} catch (\Exception $e) {
+} catch (Exception $e) {
     die('Unexpected error. Message: ' . $e->getMessage());
 }
 
